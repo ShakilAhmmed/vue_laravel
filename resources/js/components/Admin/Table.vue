@@ -31,13 +31,48 @@
 			      <td v-text="projectlist_value.created_at"></td>
 			      <td>
 			      	<button class="btn btn-danger" @click="Delete(projectlist_value.project_id,index)"><i class="fa fa-trash"></i></button>
-			      	<button class="btn btn-info" @click="Edit(projectlist_value.project_id,index)"><i class="fa fa-pen"></i></button>
+			      	<button class="btn btn-info" data-toggle="modal" data-target="#EditModalLabel" @click="Edit(projectlist_value.project_id,projectlist_value)"><i class="fa fa-pen"></i></button>
 			      </td>
 		    </tr>
 		  </tbody>
 		</table>
 		<button class="btn btn-primary float-right" @click.prevent="getPrev" v-if="project_name_search || project_description_search">Back To All</button>
 		<pagination :data="projectlist" @pagination-change-page="getResults"></pagination>
+
+
+		<div class="modal fade" id="EditModalLabel" tabindex="-1" role="dialog" aria-labelledby="EditModalLabel" aria-hidden="true">
+		  <div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h5 class="modal-title" id="exampleModalLabel">Edit Project</h5>
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		          <span aria-hidden="true">&times;</span>
+		        </button>
+		      </div>
+		     <form>
+		      <div class="modal-body">
+		        <div class="form-group">
+				    <label for="exampleInputPassword1">Project Name</label>
+				    <input type="text" class="form-control"  v-model="EditProjectData.project_name" id="exampleInputPassword1" placeholder="Project Name">
+				    <span class="text-danger" v-if="AllError.project_name" v-text="AllError.project_name[0]"></span>
+				 </div>	
+				 <div class="form-group">
+				    <label for="exampleInputPassword2">Project Description</label>
+				   <textarea class="form-control" v-model="EditProjectData.project_description"></textarea>
+				   <span class="text-danger" v-if="AllError.project_description" v-text="AllError.project_description[0]"></span>
+				 </div>	
+
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" @click="ClearForm()" class="btn btn-secondary close" data-dismiss="modal">Close</button>
+		        <button type="button"  @click.prevent="EditProject()" class="btn btn-primary">Update changes</button>
+		      </div>
+		  	</form>
+		      
+		    </div>
+		  </div>
+		</div>
+
 		
 	</div>
 </template>
@@ -47,7 +82,13 @@
 		data(){
 			return{
 				project_name_search:'',
-				project_description_search:''
+				project_description_search:'',
+				EditProjectData:{
+						project_id:'',
+						project_name:'',
+						project_description:''
+				},
+				AllError:[]
 			}
 		},
 		methods:{
@@ -108,7 +149,45 @@
 					this.projectlist=response.data
 					console.log(response.data)
 				});
-			}
+			},
+			Edit:function(id,data){
+				const _this=this;
+				_this.EditProjectData.project_id=id
+				_this.EditProjectData=data;
+			},
+			EditProject:function(event){
+				const _this=this;
+			    //Update Data
+				axios.put(baseUrl+'project/'+_this.EditProjectData.project_id,_this.EditProjectData)
+				.then((response)=>{
+				    if(response.data.status===201)
+					{
+						// console.log(response.data.data);
+						// console.log(_this.ProjectList);
+						//_this.projectlist.data.push(response.data.data);
+						$(".close").click();
+						swal.fire("Success","Project Added Successfully","success");
+						_this.ClearForm();
+					}
+					if(response.data.status===400)
+					{
+						_this.AllError=response.data.errors
+						
+					}
+				})
+				.catch((error)=>{
+					console.log(error)
+				})
+
+			},
+			ClearForm:function(){
+				const _this=this;
+				_this.AllError=[];
+				_this.EditProjectData.project_id='';
+				_this.EditProjectData.project_name='';
+				_this.EditProjectData.project_description='';
+
+			},
 		},
 		computed:{
 			Search:function(){

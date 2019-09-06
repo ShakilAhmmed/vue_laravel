@@ -38,9 +38,6 @@ class ProjectController extends Controller
        
 
         return $projects;
-       // return response()->json([
-       //      'data'=>$projects
-       // ],200);
     }
 
     /**
@@ -91,7 +88,23 @@ class ProjectController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $project=ProjectModel::findOrFail($id);
+        $validation=Validator::make($request->all(),$project->validation_rules($id));
+        if($validation->fails())
+        {
+            $response=[
+                'errors'=>$validation->errors(),
+                'status'=>400
+            ];
+        }
+        else 
+        {
+            $project->fill($request->all())->save();
+            $response=[
+                'status'=>201
+            ];
+        }
+        return response()->json($response);
     }
 
     /**

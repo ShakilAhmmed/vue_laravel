@@ -2,13 +2,10 @@
 	<div>
 		<div class="row">
 			<div class="col-sm-4">
-					<input type="text" class="form-control" v-model="project_name_search">
+					<input type="text" class="form-control" v-model="project_name_search" @keyup="getResults">
 			</div>
 			<div class="col-sm-4">
-					<input type="text" class="form-control" v-model="project_description_search">
-			</div>
-			<div class="col-sm-4">
-				<button class="btn btn-success"  @click.prevent="getResults"><i class="fa fa-search"></i></button>
+					<input type="text" class="form-control" v-model="project_description_search" @keyup="getResults">
 			</div>
 		</div>
 		<table class="table" style="margin-top: 5%;">
@@ -18,6 +15,7 @@
 		      <th scope="col">Sl No</th>
 		      <th scope="col">Project Name</th>
 		      <th scope="col">Description</th>
+		      <th scope="col">Image</th>
 		      <th scope="col">Created At</th>
 		      <th scope="col">Action</th>
 		    </tr>
@@ -29,6 +27,7 @@
 			      <td v-text="projectlist_value.project_name"></td>
 			      <td v-text="projectlist_value.project_description"></td>
 			      <td v-text="projectlist_value.created_at"></td>
+			      <td @click="PreviewImage(projectlist_value.project_logo)" data-toggle="modal" data-target="#PreviewModal"><img :src="projectlist_value.project_logo" class="rounded-circle" style="height: 20%;"></td>
 			      <td>
 			      	<button class="btn btn-danger" @click="Delete(projectlist_value.project_id,index)"><i class="fa fa-trash"></i></button>
 			      	<button class="btn btn-info" data-toggle="modal" data-target="#EditModalLabel" @click="Edit(projectlist_value.project_id,projectlist_value)"><i class="fa fa-pen"></i></button>
@@ -64,11 +63,22 @@
 
 		      </div>
 		      <div class="modal-footer">
-		        <button type="button" @click="ClearForm()" class="btn btn-secondary close" data-dismiss="modal">Close</button>
+		        <button type="button" @click="ClearForm()" class="close btn btn-secondary" data-dismiss="modal">Close</button>
 		        <button type="button"  @click.prevent="EditProject()" class="btn btn-primary">Update changes</button>
 		      </div>
 		  	</form>
 		      
+		    </div>
+		  </div>
+		</div>
+		
+
+		<div class="modal fade" id="PreviewModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		  <div class="modal-dialog" role="document">
+		    <div class="modal-content" style="width: 66%;margin-left: 22%;">
+		      <div class="modal-body">
+		        <img :src="image_preview">
+		      </div>
 		    </div>
 		  </div>
 		</div>
@@ -88,7 +98,8 @@
 						project_name:'',
 						project_description:''
 				},
-				AllError:[]
+				AllError:[],
+				image_preview:''
 			}
 		},
 		methods:{
@@ -130,6 +141,9 @@
 
 				
 			},
+			PreviewImage:function(image){
+				this.image_preview=image;
+			},
 			getResults:function(page=1){
 				const _this=this;
 				let main_url='';
@@ -165,7 +179,8 @@
 						// console.log(response.data.data);
 						// console.log(_this.ProjectList);
 						//_this.projectlist.data.push(response.data.data);
-						$(".close").click();
+						//$("#EditModalLabel").modal('hide');
+						$(".close").click()
 						swal.fire("Success","Project Added Successfully","success");
 						_this.ClearForm();
 					}
@@ -183,9 +198,9 @@
 			ClearForm:function(){
 				const _this=this;
 				_this.AllError=[];
-				_this.EditProjectData.project_id='';
-				_this.EditProjectData.project_name='';
-				_this.EditProjectData.project_description='';
+				// _this.EditProjectData.project_id='';
+				// _this.EditProjectData.project_name='';
+				// _this.EditProjectData.project_description='';
 
 			},
 		},

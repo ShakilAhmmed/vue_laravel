@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\ProjectModel;
 use Validator;
+use Image;
+use Arr;
+use Helper;
 class ProjectController extends Controller
 {
     /**
@@ -59,11 +62,35 @@ class ProjectController extends Controller
         }
         else 
         {
-            $project->fill($request->all())->save();
-            $response=[
-                'data'=>$project,
-                'status'=>201
-            ];
+            $requested_data=$request->all();
+            if($request->project_logo)
+            {
+                $position=strpos($request->project_logo, ';');
+                $sub=substr($request->project_logo, 0,$position);
+                $ext=explode('/',$sub);
+                $allowed=Helper::ImageExtension($ext[1]);
+                if($allowed=="Allowed")
+                {
+                    $imageName = time().'.'.$ext[1];
+                    $file_name='images/'.$imageName;
+                    $img =Image::make($request->project_logo)->resize(300, 200);
+                    $img->save($file_name);
+                    Arr::set($requested_data,'project_logo',$file_name);
+                    $project->fill($requested_data)->save();
+                    $response=[
+                        'data'=>$project,
+                        'status'=>201
+                    ];   
+                }
+                else
+                {
+                    $response=[
+                        'errors'=>['project_logo_ext'=>$allowed],
+                        'status'=>400
+                    ];
+                }
+
+            }
         }
         return response()->json($response);
     }

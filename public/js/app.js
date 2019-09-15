@@ -1741,6 +1741,20 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ["projectlist"],
@@ -1751,7 +1765,8 @@ __webpack_require__.r(__webpack_exports__);
     return {
       ProjectData: {
         project_name: '',
-        project_description: ''
+        project_description: '',
+        project_logo: 'images/blank.png'
       },
       ProjectList: [],
       AllError: []
@@ -1759,13 +1774,18 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     AddProject: function AddProject() {
-      var _this = this; //Store Data
+      var _this = this; //console.log(_this.ProjectData.project_logo);
+      //Store Data
+      //
 
 
+      console.log(_this.ProjectData);
       axios.post(baseUrl + 'project', _this.ProjectData).then(function (response) {
+        console.log(response.data);
+
         if (response.data.status === 201) {
-          // console.log(response.data.data);
-          // console.log(_this.ProjectList);
+          console.log(response.data.data); // console.log(_this.ProjectList);
+
           _this.ProjectList.data.push(response.data.data);
 
           $(".close").click();
@@ -1781,20 +1801,33 @@ __webpack_require__.r(__webpack_exports__);
         console.log(error);
       });
     },
+    ImageGet: function ImageGet(event) {
+      var _this2 = this;
+
+      var file = event.target.files[0];
+      var reader = new FileReader();
+
+      reader.onload = function (event) {
+        _this2.ProjectData.project_logo = event.target.result;
+      };
+
+      reader.readAsDataURL(file);
+    },
     ClearForm: function ClearForm() {
       var _this = this;
 
       _this.AllError = [];
       _this.ProjectData.project_name = '';
       _this.ProjectData.project_description = '';
+      _this.ProjectData.project_logo = '';
     }
   },
   created: function created() {
-    var _this2 = this;
+    var _this3 = this;
 
     //Fetch Data
     axios.get(baseUrl + 'project?page=' + 1).then(function (response) {
-      _this2.ProjectList = response.data;
+      _this3.ProjectList = response.data;
       console.log(response.data);
     })["catch"](function (error) {
       console.log(error);
@@ -2486,6 +2519,16 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['projectlist'],
   data: function data() {
@@ -2497,7 +2540,8 @@ __webpack_require__.r(__webpack_exports__);
         project_name: '',
         project_description: ''
       },
-      AllError: []
+      AllError: [],
+      image_preview: ''
     };
   },
   methods: {
@@ -2529,6 +2573,9 @@ __webpack_require__.r(__webpack_exports__);
           });
         }
       });
+    },
+    PreviewImage: function PreviewImage(image) {
+      this.image_preview = image;
     },
     getResults: function getResults() {
       var _this2 = this;
@@ -2569,6 +2616,7 @@ __webpack_require__.r(__webpack_exports__);
           // console.log(response.data.data);
           // console.log(_this.ProjectList);
           //_this.projectlist.data.push(response.data.data);
+          //$("#EditModalLabel").modal('hide');
           $(".close").click();
           swal.fire("Success", "Project Added Successfully", "success");
 
@@ -2585,10 +2633,9 @@ __webpack_require__.r(__webpack_exports__);
     ClearForm: function ClearForm() {
       var _this = this;
 
-      _this.AllError = [];
-      _this.EditProjectData.project_id = '';
-      _this.EditProjectData.project_name = '';
-      _this.EditProjectData.project_description = '';
+      _this.AllError = []; // _this.EditProjectData.project_id='';
+      // _this.EditProjectData.project_name='';
+      // _this.EditProjectData.project_description='';
     }
   },
   computed: {
@@ -42235,129 +42282,190 @@ var render = function() {
               _c("div", { staticClass: "modal-content" }, [
                 _vm._m(0),
                 _vm._v(" "),
-                _c("form", [
-                  _c("div", { staticClass: "modal-body" }, [
-                    _c("div", { staticClass: "form-group" }, [
-                      _c("label", { attrs: { for: "exampleInputPassword1" } }, [
-                        _vm._v("Project Name")
-                      ]),
-                      _vm._v(" "),
-                      _c("input", {
-                        directives: [
-                          {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.ProjectData.project_name,
-                            expression: "ProjectData.project_name"
-                          }
-                        ],
-                        staticClass: "form-control",
-                        attrs: {
-                          type: "text",
-                          id: "exampleInputPassword1",
-                          placeholder: "Project Name"
-                        },
-                        domProps: { value: _vm.ProjectData.project_name },
-                        on: {
-                          input: function($event) {
-                            if ($event.target.composing) {
-                              return
+                _c(
+                  "form",
+                  {
+                    attrs: { enctype: "multipart/form-data" },
+                    on: {
+                      submit: function($event) {
+                        $event.preventDefault()
+                        return _vm.AddProject($event)
+                      }
+                    }
+                  },
+                  [
+                    _c("div", { staticClass: "modal-body" }, [
+                      _c("div", { staticClass: "form-group" }, [
+                        _c(
+                          "label",
+                          { attrs: { for: "exampleInputPassword1" } },
+                          [_vm._v("Project Name")]
+                        ),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.ProjectData.project_name,
+                              expression: "ProjectData.project_name"
                             }
-                            _vm.$set(
-                              _vm.ProjectData,
-                              "project_name",
-                              $event.target.value
-                            )
-                          }
-                        }
-                      }),
-                      _vm._v(" "),
-                      _vm.AllError.project_name
-                        ? _c("span", {
-                            staticClass: "text-danger",
-                            domProps: {
-                              textContent: _vm._s(_vm.AllError.project_name[0])
-                            }
-                          })
-                        : _vm._e()
-                    ]),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "form-group" }, [
-                      _c("label", { attrs: { for: "exampleInputPassword2" } }, [
-                        _vm._v("Project Description")
-                      ]),
-                      _vm._v(" "),
-                      _c("textarea", {
-                        directives: [
-                          {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.ProjectData.project_description,
-                            expression: "ProjectData.project_description"
-                          }
-                        ],
-                        staticClass: "form-control",
-                        domProps: {
-                          value: _vm.ProjectData.project_description
-                        },
-                        on: {
-                          input: function($event) {
-                            if ($event.target.composing) {
-                              return
-                            }
-                            _vm.$set(
-                              _vm.ProjectData,
-                              "project_description",
-                              $event.target.value
-                            )
-                          }
-                        }
-                      }),
-                      _vm._v(" "),
-                      _vm.AllError.project_description
-                        ? _c("span", {
-                            staticClass: "text-danger",
-                            domProps: {
-                              textContent: _vm._s(
-                                _vm.AllError.project_description[0]
+                          ],
+                          staticClass: "form-control",
+                          attrs: {
+                            type: "text",
+                            id: "exampleInputPassword1",
+                            placeholder: "Project Name"
+                          },
+                          domProps: { value: _vm.ProjectData.project_name },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.ProjectData,
+                                "project_name",
+                                $event.target.value
                               )
                             }
-                          })
-                        : _vm._e()
-                    ])
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "modal-footer" }, [
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-secondary close",
-                        attrs: { type: "button", "data-dismiss": "modal" },
-                        on: {
-                          click: function($event) {
-                            return _vm.ClearForm()
                           }
-                        }
-                      },
-                      [_vm._v("Close")]
-                    ),
+                        }),
+                        _vm._v(" "),
+                        _vm.AllError.project_name
+                          ? _c("span", {
+                              staticClass: "text-danger",
+                              domProps: {
+                                textContent: _vm._s(
+                                  _vm.AllError.project_name[0]
+                                )
+                              }
+                            })
+                          : _vm._e()
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group" }, [
+                        _c(
+                          "label",
+                          { attrs: { for: "exampleInputPassword2" } },
+                          [_vm._v("Project Description")]
+                        ),
+                        _vm._v(" "),
+                        _c("textarea", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.ProjectData.project_description,
+                              expression: "ProjectData.project_description"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          domProps: {
+                            value: _vm.ProjectData.project_description
+                          },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.ProjectData,
+                                "project_description",
+                                $event.target.value
+                              )
+                            }
+                          }
+                        }),
+                        _vm._v(" "),
+                        _vm.AllError.project_description
+                          ? _c("span", {
+                              staticClass: "text-danger",
+                              domProps: {
+                                textContent: _vm._s(
+                                  _vm.AllError.project_description[0]
+                                )
+                              }
+                            })
+                          : _vm._e()
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group" }, [
+                        _c(
+                          "label",
+                          { attrs: { for: "exampleInputPassword2" } },
+                          [_vm._v("Project Logo")]
+                        ),
+                        _vm._v(" "),
+                        _c("input", {
+                          attrs: { type: "file", name: "" },
+                          on: { change: _vm.ImageGet }
+                        }),
+                        _vm._v(" "),
+                        _c("br"),
+                        _vm._v(" "),
+                        _vm.AllError.project_logo
+                          ? _c("span", {
+                              staticClass: "text-danger",
+                              domProps: {
+                                textContent: _vm._s(
+                                  _vm.AllError.project_logo[0]
+                                )
+                              }
+                            })
+                          : _vm._e(),
+                        _vm._v(" "),
+                        _vm.AllError.project_logo_ext
+                          ? _c("span", {
+                              staticClass: "text-danger",
+                              domProps: {
+                                textContent: _vm._s(
+                                  _vm.AllError.project_logo_ext
+                                )
+                              }
+                            })
+                          : _vm._e()
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", {
+                          attrs: { for: "exampleInputPassword2" }
+                        }),
+                        _vm._v(" "),
+                        _c("img", {
+                          staticClass: "img-thumbnail",
+                          staticStyle: { height: "20%", width: "20%" },
+                          attrs: { src: _vm.ProjectData.project_logo }
+                        })
+                      ])
+                    ]),
                     _vm._v(" "),
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-primary",
-                        attrs: { type: "button" },
-                        on: {
-                          click: function($event) {
-                            $event.preventDefault()
-                            return _vm.AddProject()
+                    _c("div", { staticClass: "modal-footer" }, [
+                      _c(
+                        "button",
+                        {
+                          staticClass: "close btn btn-secondary",
+                          attrs: { type: "button", "data-dismiss": "modal" },
+                          on: {
+                            click: function($event) {
+                              return _vm.ClearForm()
+                            }
                           }
-                        }
-                      },
-                      [_vm._v("Save changes")]
-                    )
-                  ])
-                ])
+                        },
+                        [_vm._v("Close")]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-primary",
+                          attrs: { type: "submit" }
+                        },
+                        [_vm._v("Save changes")]
+                      )
+                    ])
+                  ]
+                )
               ])
             ]
           )
@@ -43483,6 +43591,7 @@ var render = function() {
             attrs: { type: "text" },
             domProps: { value: _vm.project_name_search },
             on: {
+              keyup: _vm.getResults,
               input: function($event) {
                 if ($event.target.composing) {
                   return
@@ -43507,6 +43616,7 @@ var render = function() {
             attrs: { type: "text" },
             domProps: { value: _vm.project_description_search },
             on: {
+              keyup: _vm.getResults,
               input: function($event) {
                 if ($event.target.composing) {
                   return
@@ -43515,22 +43625,6 @@ var render = function() {
               }
             }
           })
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "col-sm-4" }, [
-          _c(
-            "button",
-            {
-              staticClass: "btn btn-success",
-              on: {
-                click: function($event) {
-                  $event.preventDefault()
-                  return _vm.getResults($event)
-                }
-              }
-            },
-            [_c("i", { staticClass: "fa fa-search" })]
-          )
         ])
       ]),
       _vm._v(" "),
@@ -43568,6 +43662,28 @@ var render = function() {
                     textContent: _vm._s(projectlist_value.created_at)
                   }
                 }),
+                _vm._v(" "),
+                _c(
+                  "td",
+                  {
+                    attrs: {
+                      "data-toggle": "modal",
+                      "data-target": "#PreviewModal"
+                    },
+                    on: {
+                      click: function($event) {
+                        return _vm.PreviewImage(projectlist_value.project_logo)
+                      }
+                    }
+                  },
+                  [
+                    _c("img", {
+                      staticClass: "rounded-circle",
+                      staticStyle: { height: "20%" },
+                      attrs: { src: projectlist_value.project_logo }
+                    })
+                  ]
+                ),
                 _vm._v(" "),
                 _c("td", [
                   _c(
@@ -43747,7 +43863,7 @@ var render = function() {
                     _c(
                       "button",
                       {
-                        staticClass: "btn btn-secondary close",
+                        staticClass: "close btn btn-secondary",
                         attrs: { type: "button", "data-dismiss": "modal" },
                         on: {
                           click: function($event) {
@@ -43778,6 +43894,40 @@ var render = function() {
             ]
           )
         ]
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "modal fade",
+          attrs: {
+            id: "PreviewModal",
+            tabindex: "-1",
+            role: "dialog",
+            "aria-labelledby": "exampleModalLabel",
+            "aria-hidden": "true"
+          }
+        },
+        [
+          _c(
+            "div",
+            { staticClass: "modal-dialog", attrs: { role: "document" } },
+            [
+              _c(
+                "div",
+                {
+                  staticClass: "modal-content",
+                  staticStyle: { width: "66%", "margin-left": "22%" }
+                },
+                [
+                  _c("div", { staticClass: "modal-body" }, [
+                    _c("img", { attrs: { src: _vm.image_preview } })
+                  ])
+                ]
+              )
+            ]
+          )
+        ]
       )
     ],
     1
@@ -43797,6 +43947,8 @@ var staticRenderFns = [
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Project Name")]),
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Description")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Image")]),
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Created At")]),
         _vm._v(" "),

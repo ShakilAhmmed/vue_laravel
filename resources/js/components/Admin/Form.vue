@@ -13,7 +13,7 @@
 		          <span aria-hidden="true">&times;</span>
 		        </button>
 		      </div>
-		     <form>
+		     <form enctype="multipart/form-data"  @submit.prevent="AddProject">
 		      <div class="modal-body">
 		        <div class="form-group">
 				    <label for="exampleInputPassword1">Project Name</label>
@@ -24,12 +24,26 @@
 				    <label for="exampleInputPassword2">Project Description</label>
 				   <textarea class="form-control" v-model="ProjectData.project_description"></textarea>
 				   <span class="text-danger" v-if="AllError.project_description" v-text="AllError.project_description[0]"></span>
+				 </div>
+
+				 <div class="form-group">
+				    <label for="exampleInputPassword2">Project Logo</label>
+				  	<input type="file" name="" @change="ImageGet">
+				  	<br>
+				   <span class="text-danger" v-if="AllError.project_logo" v-text="AllError.project_logo[0]"></span>
+				   <span class="text-danger" v-if="AllError.project_logo_ext" v-text="AllError.project_logo_ext"></span>
+				 </div>
+
+				  <div class="form-group">
+				    <label for="exampleInputPassword2"></label>
+				  	<img :src="ProjectData.project_logo" class="img-thumbnail" style="height: 20%;width: 20%;">
 				 </div>	
+
 
 		      </div>
 		      <div class="modal-footer">
-		        <button type="button" @click="ClearForm()" class="btn btn-secondary close" data-dismiss="modal">Close</button>
-		        <button type="button"  @click.prevent="AddProject()" class="btn btn-primary">Save changes</button>
+		        <button type="button" @click="ClearForm()" class="close btn btn-secondary" data-dismiss="modal">Close</button>
+		        <button type="submit"  class="btn btn-primary">Save changes</button>
 		      </div>
 		  	</form>
 		      
@@ -52,7 +66,8 @@ export default{
 		return {
 			ProjectData:{
 				project_name:'',
-				project_description:''
+				project_description:'',
+				project_logo:'images/blank.png'
 			},
 			ProjectList:[],
 			AllError:[]
@@ -61,12 +76,16 @@ export default{
 	methods:{
 		AddProject:function(){
 			const _this=this;
+			//console.log(_this.ProjectData.project_logo);
 			//Store Data
+			//
+			console.log(_this.ProjectData);
 			axios.post(baseUrl+'project',_this.ProjectData)
 			.then((response)=>{
+				console.log(response.data);
 				if(response.data.status===201)
 				{
-					// console.log(response.data.data);
+					console.log(response.data.data);
 					// console.log(_this.ProjectList);
 					_this.ProjectList.data.push(response.data.data);
 					$(".close").click();
@@ -75,8 +94,7 @@ export default{
 				}
 				if(response.data.status===400)
 				{
-					_this.AllError=response.data.errors
-					
+					_this.AllError=response.data.errors					
 				}
 			})
 			.catch((error)=>{
@@ -84,12 +102,22 @@ export default{
 			})
 
 		},
+		ImageGet:function(event)
+		{	
+              let file=event.target.files[0];
+              let reader=new FileReader();
+              reader.onload=event =>{
+              	this.ProjectData.project_logo = event.target.result;
+              }
+              reader.readAsDataURL(file)
+		},
 		ClearForm:function()
 		{
 			const _this=this;
 			_this.AllError=[];
 			_this.ProjectData.project_name='';
 			_this.ProjectData.project_description='';
+			_this.ProjectData.project_logo='';
 
 		},
 	},
